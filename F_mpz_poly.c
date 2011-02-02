@@ -8727,7 +8727,7 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
    }
 
    ulong num_coeffs;
-   if ((FLINT_ABS(hensel_loops) < 3) && (3*r > F->length))
+   if ((FLINT_ABS(hensel_loops) < 4) && ( (3*r > F->length) || (r > 200) ) )
    {
       mix_data = 1;
    
@@ -9041,7 +9041,7 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
 			   lll_start = clock();
 #endif
 			   
-			   newd = U_LLL_with_removal(M, 150L, B);
+			   newd = U_LLL_with_removal(M, 250L, B);
 #if POLYPROFILE
 			   lll_stop = clock();
 #endif
@@ -9051,7 +9051,7 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
 			   lll_start = clock();
 #endif
 			   
-			   newd = U_LLL_with_removal(M, 150L, B);
+			   newd = U_LLL_with_removal(M, 250L, B);
 
 #if POLYPROFILE
 			   lll_stop = clock();
@@ -9062,7 +9062,7 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
 			   lll_start = clock();
 #endif
 			   
-			   newd = U_LLL_with_removal(M, 150L, B);
+			   newd = U_LLL_with_removal(M, 250L, B);
 
 #if POLYPROFILE
 			   lll_stop = clock();
