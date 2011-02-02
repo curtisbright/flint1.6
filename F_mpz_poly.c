@@ -8786,10 +8786,14 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
    if (mix_data)
    {
 // ADJUSTMENT OF PHILOSOPHY
-      F_mpz_mat_rand_unimodular_little_big(A, (long) (data_avail/2), 0, 0);
+      F_mpz_mat_rand_unimodular_little_big(A, (long) (data_avail/2), 2, 0);
+
+      F_mpz_mat_print_pretty(A);
 
       F_mpz_mat_transpose(abs_A, A);
       F_mpz_mat_block_reverse_cols(A, (long) (data_avail/2), abs_A);
+
+      F_mpz_mat_print_pretty(A);
 
       for (i = 0; i < data_avail; i++)
          for (j = 0; j < data_avail; j++)
