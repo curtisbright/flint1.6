@@ -8786,7 +8786,7 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
    if (mix_data)
    {
 // ADJUSTMENT OF PHILOSOPHY
-      F_mpz_mat_rand_unimodular_little_big(A, (long) (data_avail/2), 2, 0);
+/*      F_mpz_mat_rand_unimodular_little_big(A, (long) (data_avail/2), 2, 0);
 
       F_mpz_mat_print_pretty(A);
 
@@ -8811,7 +8811,7 @@ int F_mpz_poly_factor_sq_fr_vHN(F_mpz_poly_factor_t final_fac, F_mpz_poly_factor
       for (j = 0; j < data_avail; j++)
          F_mpz_set(mixed_data->rows[r] + j, mixed_data_bounds->rows[0] + j);
 
-      F_mpz_mat_set(data, mixed_data);
+      F_mpz_mat_set(data, mixed_data);*/
    }
 
    int ok, col_cnt,  since_last, LLL_ready, n_cols_per_LLL, max_cols_per_LLL;
