@@ -173,7 +173,7 @@ int check_Babai (int kappa, F_mpz_mat_t B, double **mu, double **r, double *s,
       test = 0;
 
       loops++;
-      if (loops > 2){
+      if (loops > 200){
          return -1;
       }
             
@@ -495,7 +495,7 @@ int check_Babai_heuristic_d (int kappa, F_mpz_mat_t B, double **mu, double **r, 
       test = 0;
             
       loops++;
-      if (loops > 10)
+      if (loops > 200)
          return -1;
 
       /* ************************************** */
@@ -829,7 +829,7 @@ int check_Babai_heuristic(int kappa, F_mpz_mat_t B, __mpfr_struct **mu, __mpfr_s
    {
       test = 0;
       loops++;
-      if (loops > 20)
+      if (loops > 200)
          return -1;
 
       /* ************************************** */
@@ -1053,7 +1053,7 @@ int advance_check_Babai (int cur_kappa, int kappa, F_mpz_mat_t B, double **mu, d
       test = 0;
 
       loops++;
-      if (loops > 5)
+      if (loops > 200)
 	  {
          return -1;
       }
@@ -1253,7 +1253,7 @@ int advance_check_Babai_heuristic_d (int cur_kappa, int kappa, F_mpz_mat_t B, do
       test = 0;
             
       loops++;
-      if (loops > 3)
+      if (loops > 200)
          return -1;
 
       /* ************************************** */
@@ -1451,7 +1451,7 @@ int advance_check_Babai_heuristic(int cur_kappa, int kappa, F_mpz_mat_t B, __mpf
    {
       test = 0;
       loops++;
-      if (loops > 20)
+      if (loops > 200)
          return -1;
 
       /* ************************************** */
@@ -1613,7 +1613,7 @@ int check_Babai_heuristic_d_zero_vec (int kappa, F_mpz_mat_t B, double **mu, dou
       test = 0;
             
       loops++;
-      if (loops > 20)
+      if (loops > 200)
       {
 #if TRACE
          F_mpz_mat_print_pretty(B);
@@ -1883,7 +1883,7 @@ int LLL_d(F_mpz_mat_t B)
       /* ********************************** */
       /* Step3: Call to the Babai algorithm */
       /* ********************************** */   
-      if (num_failed_fast < 50)
+      if (num_failed_fast < 20)
       {
          babai_ok = check_Babai(kappa, B, mu, r, s, appB, expo, appSP, alpha[kappa], zeros, 
 			                        kappamax, FLINT_MIN(kappamax + 1 + shift, n)); 
