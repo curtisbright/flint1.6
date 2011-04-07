@@ -4659,6 +4659,10 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
    sum_start = clock();
 #endif
 
+   signal(SIGABRT, &handler);
+   signal(SIGTERM, &handler);
+   signal(SIGINT, &handler);
+
    r = FM->r;
    c = FM->c;
    bits = FLINT_ABS(F_mpz_mat_max_bits(FM));
