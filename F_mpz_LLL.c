@@ -4633,6 +4633,9 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
    int full_prec = 1;
    int done = 0;
 
+    clock_t timer1, timer2;
+    timer1 = clock();
+
 #if PROFILE
    clock_t lll_start, lll_stop, lll_total, sum_start, sum_stop;
 #endif
@@ -4752,6 +4755,10 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
          F_mpz_mat_mul_classical(full_data, U, full_data);
 
          mbits = FLINT_ABS(F_mpz_mat_max_bits(full_data));
+         printf("mbits is %ld\n", mbits);
+         timer2 = clock();
+         printf(" spent a total of %f seconds in ULLL\n", (double) (timer2 - timer1) / (double) CLOCKS_PER_SEC);
+         
          // make this condition better?
          if ((mbits - new_size > 0) &&  (mbits <= prev_mbits - (long)(new_size/4)) && is_U_I == 0)
 		 {
