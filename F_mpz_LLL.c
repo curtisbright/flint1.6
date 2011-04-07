@@ -47,7 +47,7 @@
 #include "mpfr.h"
 #include "mpfr_mat.h"
 #include "d_mat.h"
-
+#include <signal.h>
 
 /****************************************************************************
 
@@ -98,6 +98,18 @@
    double hldexp_total = 0.0;
 
 #endif
+
+int global_flag = 0;
+
+typedef void (*sighandler_t)(int);
+
+void handler(int varn){
+
+    printf("I've been handled\n");
+    global_flag++;
+
+    return;
+}
 
 /*
    Computes the scalar product of two vectors of doubles vec1 and vec2, which are 
@@ -4758,6 +4770,14 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
          fprintf(stderr, "mbits is %ld\n", mbits);
          timer2 = clock();
          fprintf(stderr, " spent a total of %f seconds in ULLL\n", (double) (timer2 - timer1) / (double) CLOCKS_PER_SEC);
+
+         if (global_flag > 0){
+
+            F_mpz_mat_print_pretty(full_data);
+            fflush(stdout);
+            global_flag = 0;
+
+         }
          
          // make this condition better?
          if ((mbits - new_size > 0) &&  (mbits <= prev_mbits - (long)(new_size/4)) && is_U_I == 0)
