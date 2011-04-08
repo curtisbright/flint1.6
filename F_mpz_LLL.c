@@ -3441,32 +3441,6 @@ int knapsack_LLL_d_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
       if ((num_loops % 1500) == 0)
         fprintf(stderr, "loop number still not mpfr, %ld\n", num_loops);
 
-      if (num_loops > 145000){
-        fprintf(stderr, "abandoning ship again\n");
-        if (B->r >= 4){
-           block_U_LLL(B, 250, 10, B->r / 4);
-        }
-        else{
-           fprintf(stderr, "this is whack\n");
-        }
-         free(alpha);
-         free(expo);
-         free(copy_alpha);
-         free(copy_expo);
-         d_mat_clear(mu);
-         d_mat_clear(r);
-         d_mat_clear(appB);
-         d_mat_clear(appSP);
-         d_mat_clear(copy_mu);
-         d_mat_clear(copy_r);
-         d_mat_clear(copy_appB);
-         d_mat_clear(copy_appSP);
-         free(s);
-         free(copy_s);
-         free(appSPtmp);
-         return knapsack_LLL_d_with_removal(B, gs_B);        
-      }
-
       new_kappa = 0;
       if (kappa > kappamax)
       {
