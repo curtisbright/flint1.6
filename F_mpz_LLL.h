@@ -124,7 +124,7 @@ void gs_Babai(int kappa, F_mpz_mat_t B, double **mu, double **r, double *s,
        double **appB, int *expo, double **appSP, 
        int a, int zeros, int kappamax, int n);
 
-int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B);
+int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_B);
 
 ulong getShift(F_mpz_mat_t B);
 
