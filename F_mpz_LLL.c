@@ -4638,6 +4638,223 @@ ulong F_mpz_mat_gs_d( F_mpz_mat_t B, F_mpz_t gs_B)
 
 ****************************************/
 
+int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
+{
+
+   long r, c, bits, i, j;
+   int full_prec = 1;
+   int done = 0;
+
+    clock_t timer1, timer2;
+    timer1 = clock();
+
+#if PROFILE
+   clock_t lll_start, lll_stop, lll_total, sum_start, sum_stop;
+#endif
+
+   int is_U_I;
+
+#if PROFILE
+   lll_total = 0;
+   sum_start = clock();
+#endif
+
+   signal(SIGABRT, &handler);
+   signal(SIGTERM, &handler);
+   signal(SIGINT, &handler);
+
+   r = FM->r;
+   c = FM->c;
+   bits = FLINT_ABS(F_mpz_mat_max_bits(FM));
+
+   F_mpz_mat_t U;
+
+   F_mpz_mat_t I;
+   F_mpz_mat_init_identity(I, r);
+
+   F_mpz_mat_t full_U;
+   F_mpz_mat_init_identity(full_U, r);
+
+   F_mpz_mat_t big_FM;
+   F_mpz_mat_init(big_FM, r, c + r);
+
+   F_mpz_mat_t full_data;
+   F_mpz_mat_init(full_data, r, c);
+
+   F_mpz_mat_t trunc_data;
+   F_mpz_mat_init(trunc_data, r, c);
+
+   long mbits;
+
+   int k = 1;
+
+   int newd;
+   long prev_mbits = bits;
+
+   if (bits > new_size)
+   {
+      full_prec = 0;
+      
+	  //do some truncating
+      for ( i = 0; i < r; i++)
+         for ( j = 0; j < c; j++)
+            F_mpz_set(full_data->rows[i]+j, FM->rows[i]+j);
+
+      mbits = FLINT_ABS(F_mpz_mat_max_bits(full_data));
+
+      if (mbits - new_size > 0)
+	  {
+         F_mpz_mat_resize(trunc_data, full_data->r, full_data->c);
+		 F_mpz_mat_div_2exp(trunc_data, full_data, (ulong) (mbits - new_size));
+         
+		 // Make this iterate over i and j, make a LARGE lattice which has identity 
+		 // in one corner and FM in the other
+         for ( i = 0; i < r; i++)
+		 {
+            for (j = 0; j < i; j++)
+               F_mpz_set_ui(big_FM->rows[i] + j, 0L);
+            F_mpz_set_ui(big_FM->rows[i] + i, 1L);
+            
+			for (j = i + 1; j < r; j++)
+               F_mpz_set_ui(big_FM->rows[i] + j, 0L);
+            
+			for (j = r; j < r + c; j++)
+               F_mpz_set(big_FM->rows[i] + j, trunc_data->rows[i] + j - r);
+         }
+      } else
+	  {
+         full_prec = 1;
+      }
+   }
+
+   while (done == 0)
+   {
+      k++;
+      if (full_prec == 0)
+	  {
+#if PROFILE
+         lll_start = clock();
+#endif
+		 knapsack_LLL_wrapper_with_removal(big_FM, gs_B);
+#if PROFILE
+         lll_stop = clock();
+#endif
+      } else
+	  {
+#if PROFILE
+         lll_start = clock();
+#endif
+		 newd = knapsack_LLL_wrapper_with_removal(FM, gs_B);
+#if PROFILE
+         lll_stop = clock();
+#endif
+      }
+
+#if PROFILE
+      lll_total = lll_total + lll_stop - lll_start;
+#endif
+
+      if (full_prec == 1)
+         done = 1;
+      else 
+	  {
+         // add more bits
+         F_mpz_mat_window_init(U, big_FM, 0, 0, big_FM->r, r);
+
+#if PROFILE
+         printf("U bits == %ld\n", FLINT_ABS(F_mpz_mat_max_bits(U)));
+#endif
+
+		 is_U_I = F_mpz_mat_equal(U, I);
+
+         // do some truncating
+         F_mpz_mat_mul_classical(full_data, U, full_data);
+
+         mbits = FLINT_ABS(F_mpz_mat_max_bits(full_data));
+         fprintf(stderr, "mbits is %ld\n", mbits);
+         timer2 = clock();
+         fprintf(stderr, " spent a total of %f seconds in ULLL\n", (double) (timer2 - timer1) / (double) CLOCKS_PER_SEC);
+
+         if (global_flag > 0){
+
+            F_mpz_mat_print_pretty(full_data);
+            fflush(stdout);
+            global_flag = 0;
+
+         }
+         
+         // make this condition better?
+         if ((mbits - new_size > 0) &&  (mbits <= prev_mbits - (long)(new_size/4)) && is_U_I == 0)
+		 {
+            F_mpz_mat_div_2exp(trunc_data, full_data, (ulong) (mbits - new_size));
+         } else
+		 {
+            full_prec = 1;
+         }
+
+         prev_mbits = mbits;
+
+         if (full_prec == 1)
+		 {
+            // can switch to FM, no need for a new identity
+            for ( i = 0; i < r; i++){
+               for (j = 0; j < c; j++)
+                  F_mpz_set(FM->rows[i]+j, full_data->rows[i] + j);
+            }
+         } else
+		 {
+            // keep with the big_FM concept
+            for ( i = 0; i < r; i++)
+			{
+               for (j = 0; j < i; j++)
+                  F_mpz_set_ui(big_FM->rows[i]+j, 0L);
+               F_mpz_set_ui(big_FM->rows[i]+i, 1L);
+               
+			   for (j = i+1; j < r; j++)
+                  F_mpz_set_ui(big_FM->rows[i]+j, 0L);
+               
+			   for (j = r; j < r+c; j++)
+                  F_mpz_set(big_FM->rows[i]+j, trunc_data->rows[i] + j-r);
+            }
+         }
+         
+		 F_mpz_mat_window_clear(U);
+      }
+
+   }
+
+#if PROFILE
+   sum_stop = clock();
+
+   printf(" spent a total of %3f seconds on regular Babai\n", (double) babai_total / 2.4E9);
+   printf(" of which %3f cycles spent doing ldexps\n", (double) ldexp_total / 2.4E9);
+   printf(" of which %3f cycles spent updating full precision B\n", (double) update_total / 2.4E9);
+   printf(" of which %3f cycles spent converting full precision B\n", (double) convert_total / 2.4E9);
+   printf(" of which %3f cycles spent computing inner products\n", (double) inner_total /2.4E9);
+   printf(" spent a total of %3f seconds on advanced Babai\n", (double) adv_babai_total /2.4E9);
+
+   printf(" spent a total of %3f seconds on h regular Babai\n", (double) hbabai_total / 2.4E9);
+   printf(" of which %3f cycles spent doing h ldexps\n", (double) hldexp_total / 2.4E9);
+   printf(" of which %3f cycles spent updating h full precision B\n", (double) hupdate_total / 2.4E9);
+   printf(" of which %3f cycles spent converting h full precision B\n", (double) hconvert_total / 2.4E9);
+   printf(" of which %3f cycles spent computing h inner products\n", (double) hinner_total /2.4E9);
+   printf(" spent a total of %3f seconds on h advanced Babai\n", (double) hadv_babai_total /2.4E9);
+
+   printf(" spent a total of %f seconds on inner LLL\n", (double) lll_total / (double)CLOCKS_PER_SEC);
+
+   printf(" spent a total of %f seconds in ULLL\n", (double) (sum_stop - sum_start) / (double) CLOCKS_PER_SEC);
+#endif
+
+   F_mpz_mat_clear(full_data);
+   F_mpz_mat_clear(trunc_data);
+   F_mpz_mat_clear(big_FM);
+   F_mpz_mat_clear(I);
+   F_mpz_mat_clear(full_U);
+
+   return newd;
+}
+
+
 #define MAT_POS_UPDATE2 \
    do { \
       if (row != NULL) \
@@ -4731,8 +4948,7 @@ long F_mpz_mat_max_bits_knapsack(const F_mpz_mat_t M)
    return F_mpz_mat_max_bits_knapsack2(NULL, NULL, M);
 }
 
-
-int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_B)
+int k_U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_B)
 {
 
    long r, c, bits, i, j;
@@ -4882,7 +5098,7 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_B)
          if ((mbits - new_size > 0) &&  (mbits <= prev_mbits - (long)(new_size/4)) && is_U_I == 0)
 		 {
 //here we could adapt to knapsack attacks
-            if (umbits - u_size > 0){
+            if ((umbits - u_size > 0) && (umbits < mbits - new_size) ){
                 for (i = 0; i < r; i++)
                     F_mpz_div_2exp(trunc_data->rows[i], full_data->rows[i], (ulong) (mbits - new_size));
                 for (i = 0; i < r; i++)
