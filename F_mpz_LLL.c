@@ -3438,7 +3438,7 @@ int knapsack_LLL_d_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
          last_vec = 1;
       }
 
-      if ((num_loops % 15000) == 0)
+      if ((num_loops % 50000) == 0)
         fprintf(stderr, "loop number still not mpfr, %ld\n", num_loops);
 
       new_kappa = 0;
