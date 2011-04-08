@@ -3063,10 +3063,13 @@ int LLL_mpfr2_with_removal(F_mpz_mat_t B, mp_prec_t prec, F_mpz_t gs_B)
       alpha[i] = 0;
 
    int babai_fail = 0;
-    
+   long num_loops = 0; 
    while (kappa < d)
    {      
-
+      num_loops++;
+      if ((num_loops % 1500)==0){
+         fprintf(stderr,"in mpfr num loops = %ld\n",num_loops);
+      }
 
       if (kappa > kappamax) kappamax = kappa; // Fixme : should this be kappamax = kappa instead of kappamax++
 
@@ -3239,6 +3242,7 @@ int LLL_mpfr_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
       printf("mpfr LLL with prec = %ld\n", prec);
 #endif
 //wacky stuff here
+      fprintf(stderr, "mpfr prec==%ld\n", prec);
       if (prec > 106){
          return 23;
       }
@@ -3313,6 +3317,13 @@ int knapsack_LLL_wrapper_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
 #if PROFILE
       printf("called mpfr!!\n");
 #endif
+      fprintf(stderr, "mpfr coming soon\n");
+
+      FILE * f_out = fopen("mpfr_mat", "w");
+      F_mpz_mat_fprint_pretty(B, f_out);
+      fclose(f_out);
+
+
       res = LLL_mpfr_with_removal(B, gs_B);
    }
 
@@ -3423,6 +3434,9 @@ int knapsack_LLL_d_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
       if (kappa == d - 1){
          last_vec = 1;
       }
+
+      if ((num_loops % 1500) == 0)
+        fprintf(stderr, "loop number still not mpfr, %ld\n", num_loops);
 
       new_kappa = 0;
       if (kappa > kappamax)
@@ -4847,6 +4861,7 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
 #if PROFILE
          lll_start = clock();
 #endif
+        fprintf(stderr, "warning full prec\n");
 		 newd = knapsack_LLL_wrapper_with_removal(FM, gs_B);
 #if PROFILE
          lll_stop = clock();
@@ -4886,6 +4901,7 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
             global_flag = 0;
 
             if (newd == 23)
+                fprintf(stderr, "mpfr quit\n");
                 abort();
 
          }
