@@ -3302,6 +3302,9 @@ int knapsack_LLL_wrapper_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
    if (res == -1)
    { 
 	  // Now try the mpfr version
+      printf("called mpfr!!\n");
+      F_mpz_mat_print_pretty(B);
+      abort();
 #if PROFILE
       printf("called mpfr!!\n");
 #endif
@@ -4638,6 +4641,101 @@ ulong F_mpz_mat_gs_d( F_mpz_mat_t B, F_mpz_t gs_B)
 
 ****************************************/
 
+
+#define MAT_POS_UPDATE2 \
+   do { \
+      if (row != NULL) \
+      { \
+         (*row) = i; \
+		 (*col) = j; \
+      } \
+   } while (0)
+
+//ignores first column
+long F_mpz_mat_max_bits_knapsack2(ulong * row, ulong * col, const F_mpz_mat_t M)
+{
+   int sign = 0;
+   ulong max = 0;
+   ulong bits = 0;
+   ulong max_limbs = 1;
+   ulong size;
+   ulong i, j;
+   F_mpz c;
+
+   if (row != NULL)
+   {
+      *row = 0;
+	  *col = 0;
+   }
+
+   // search until we find an mpz_t coefficient or one of at least FLINT_BITS - 2 bits
+   for (i = 0; i < M->r; i++) 
+   {
+      for (j = 1; j < M->c; j++)
+	  {
+		 c = M->rows[i][j];
+		 if (COEFF_IS_MPZ(c)) goto check_mpzs; // found an mpz_t coeff
+         if (c < 0L) 
+	     {
+		    sign = 1;
+            bits = FLINT_BIT_COUNT(-c);
+	     } else bits = FLINT_BIT_COUNT(c);
+	     if (bits > max) 
+	     {
+		    max = bits;
+			MAT_POS_UPDATE2;
+	        if (max >= FLINT_BITS - 2) goto check_mpzs; // coeff is at least FLINT_BITS - 2 bits
+	     }
+	  }
+	}
+
+check_mpzs:
+
+    // search through mpz coefficients for largest size in bits
+	
+	for ( ; i < M->r; i++)
+   	{
+	   for ( ; j < M->c; j++)
+   	   {
+		  c =  M->rows[i][j];
+          if (COEFF_IS_MPZ(c))
+	   	  {
+	   		 __mpz_struct * mpz_ptr = F_mpz_ptr_mpz(c);
+	   		 if (mpz_sgn(mpz_ptr) < 0) sign = 1;
+	   		 size = mpz_size(mpz_ptr);
+	   		 if (size > max_limbs)
+	   		 {
+	   		    max_limbs = size;
+	   			mp_limb_t * data = mpz_ptr->_mp_d;
+	   		    bits = FLINT_BIT_COUNT(data[max_limbs - 1]);
+				MAT_POS_UPDATE2;
+	   			max = bits;
+	   		 } else if (size == max_limbs)
+	   		 {
+	   			mp_limb_t * data = mpz_ptr->_mp_d;
+	   		    bits = FLINT_BIT_COUNT(data[max_limbs - 1]);
+	   		    if (bits > max) 
+				{
+				   max = bits;
+				   MAT_POS_UPDATE2;
+				}
+	   		 }
+	   	  } else if ((long) c < 0L) sign = 1; // still need to check the sign of small coefficients
+	   }
+	   j = 1;
+	}
+	
+	if (sign) return -(max + FLINT_BITS*(max_limbs - 1));
+	else return max + FLINT_BITS*(max_limbs - 1);
+}
+
+static inline
+long F_mpz_mat_max_bits_knapsack(const F_mpz_mat_t M)
+{
+   return F_mpz_mat_max_bits_knapsack2(NULL, NULL, M);
+}
+
+
 int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
 {
 
@@ -4771,7 +4869,8 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
          F_mpz_mat_mul_classical(full_data, U, full_data);
 
          mbits = FLINT_ABS(F_mpz_mat_max_bits(full_data));
-         fprintf(stderr, "mbits is %ld\n", mbits);
+         long umbits = FLINT_ABS(F_mpz_mat_max_bits_knapsack(full_data));
+         fprintf(stderr, "mbits is %ld right-side bits = %ld\n", mbits, umbits);
          timer2 = clock();
          fprintf(stderr, " spent a total of %f seconds in ULLL\n", (double) (timer2 - timer1) / (double) CLOCKS_PER_SEC);
 
@@ -4852,100 +4951,6 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
    F_mpz_mat_clear(full_U);
 
    return newd;
-}
-
-
-#define MAT_POS_UPDATE2 \
-   do { \
-      if (row != NULL) \
-      { \
-         (*row) = i; \
-		 (*col) = j; \
-      } \
-   } while (0)
-
-//ignores first column
-long F_mpz_mat_max_bits_knapsack2(ulong * row, ulong * col, const F_mpz_mat_t M)
-{
-   int sign = 0;
-   ulong max = 0;
-   ulong bits = 0;
-   ulong max_limbs = 1;
-   ulong size;
-   ulong i, j;
-   F_mpz c;
-
-   if (row != NULL)
-   {
-      *row = 0;
-	  *col = 0;
-   }
-
-   // search until we find an mpz_t coefficient or one of at least FLINT_BITS - 2 bits
-   for (i = 0; i < M->r; i++) 
-   {
-      for (j = 1; j < M->c; j++)
-	  {
-		 c = M->rows[i][j];
-		 if (COEFF_IS_MPZ(c)) goto check_mpzs; // found an mpz_t coeff
-         if (c < 0L) 
-	     {
-		    sign = 1;
-            bits = FLINT_BIT_COUNT(-c);
-	     } else bits = FLINT_BIT_COUNT(c);
-	     if (bits > max) 
-	     {
-		    max = bits;
-			MAT_POS_UPDATE2;
-	        if (max >= FLINT_BITS - 2) goto check_mpzs; // coeff is at least FLINT_BITS - 2 bits
-	     }
-	  }
-	}
-
-check_mpzs:
-
-    // search through mpz coefficients for largest size in bits
-	
-	for ( ; i < M->r; i++)
-   	{
-	   for ( ; j < M->c; j++)
-   	   {
-		  c =  M->rows[i][j];
-          if (COEFF_IS_MPZ(c))
-	   	  {
-	   		 __mpz_struct * mpz_ptr = F_mpz_ptr_mpz(c);
-	   		 if (mpz_sgn(mpz_ptr) < 0) sign = 1;
-	   		 size = mpz_size(mpz_ptr);
-	   		 if (size > max_limbs)
-	   		 {
-	   		    max_limbs = size;
-	   			mp_limb_t * data = mpz_ptr->_mp_d;
-	   		    bits = FLINT_BIT_COUNT(data[max_limbs - 1]);
-				MAT_POS_UPDATE2;
-	   			max = bits;
-	   		 } else if (size == max_limbs)
-	   		 {
-	   			mp_limb_t * data = mpz_ptr->_mp_d;
-	   		    bits = FLINT_BIT_COUNT(data[max_limbs - 1]);
-	   		    if (bits > max) 
-				{
-				   max = bits;
-				   MAT_POS_UPDATE2;
-				}
-	   		 }
-	   	  } else if ((long) c < 0L) sign = 1; // still need to check the sign of small coefficients
-	   }
-	   j = 1;
-	}
-	
-	if (sign) return -(max + FLINT_BITS*(max_limbs - 1));
-	else return max + FLINT_BITS*(max_limbs - 1);
-}
-
-static inline
-long F_mpz_mat_max_bits_knapsack(const F_mpz_mat_t M)
-{
-   return F_mpz_mat_max_bits_knapsack2(NULL, NULL, M);
 }
 
 int k_U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_B)
