@@ -128,6 +128,8 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B);
 
 int k_U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_B);
 
+void block_U_LLL(F_mpz_mat_t M, long step_size, long u_size, long block_size);
+
 ulong getShift(F_mpz_mat_t B);
 
 void LLL (F_mpz_mat_t B);

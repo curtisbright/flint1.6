@@ -3243,8 +3243,11 @@ int LLL_mpfr_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
 #endif
 //wacky stuff here
       fprintf(stderr, "mpfr prec==%ld\n", prec);
-      if (prec > 106){
-         return 23;
+      if (prec >= 106){
+//rather than more prec we're gonna try block_U_LLL
+         fprintf(stderr, "using block, not more precision\n");
+         block_U_LLL(B, 250, 10, 40);
+         return 1;
       }
       result = LLL_mpfr2_with_removal(B, prec, gs_B);
       if (result == -1){
@@ -3437,6 +3440,32 @@ int knapsack_LLL_d_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
 
       if ((num_loops % 1500) == 0)
         fprintf(stderr, "loop number still not mpfr, %ld\n", num_loops);
+
+      if (num_loops > 145000){
+        fprintf(stderr, "abandoning ship again\n");
+        if (B->r >= 4){
+           block_U_LLL(B, 250, 10, B->r / 4);
+        }
+        else{
+           fprintf(stderr, "this is whack\n");
+        }
+         free(alpha);
+         free(expo);
+         free(copy_alpha);
+         free(copy_expo);
+         d_mat_clear(mu);
+         d_mat_clear(r);
+         d_mat_clear(appB);
+         d_mat_clear(appSP);
+         d_mat_clear(copy_mu);
+         d_mat_clear(copy_r);
+         d_mat_clear(copy_appB);
+         d_mat_clear(copy_appSP);
+         free(s);
+         free(copy_s);
+         free(appSPtmp);
+         return knapsack_LLL_d_with_removal(B, gs_B);        
+      }
 
       new_kappa = 0;
       if (kappa > kappamax)
@@ -5205,6 +5234,37 @@ int k_U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_
    F_mpz_mat_clear(full_U);
 
    return newd;
+}
+
+void block_U_LLL(F_mpz_mat_t M, long step_size, long u_size, long block_size){
+   F_mpz_t B;
+   F_mpz_init(B);
+   F_mpz_set_ui(B, 0);
+
+   F_mpz_mat_t active_M;
+   F_mpz_mat_init(active_M,0, 0);
+
+   long i,k,j;
+   while (block_size < M->r){
+      for ( k = 0; k < M->r; k = k + block_size){
+         fprintf(stderr, "next block from %ld to %ld\n", k, FLINT_MIN(k + block_size, M->r));
+         F_mpz_mat_resize(active_M, FLINT_MIN(k + block_size, M->r) - k, M->c);
+         for ( i = k; i < FLINT_MIN(k + block_size, M->r); i++)
+            for (j = 0; j < M->c; j++)
+               F_mpz_set(active_M->rows[i - k] + j, M->rows[i] + j);
+         k_U_LLL_with_removal(active_M, step_size, u_size, B);
+         for ( i = k; i < FLINT_MIN(k + block_size, M->r); i++)
+            for (j = 0; j < M->c; j++)
+               F_mpz_set(M->rows[i] + j, active_M->rows[i - k] + j);         
+      }
+      block_size = block_size *2;      
+   }
+
+   k_U_LLL_with_removal(M, step_size, u_size, B);
+
+   F_mpz_mat_clear(active_M);
+
+   F_mpz_clear(B);
 }
 
 /* 
