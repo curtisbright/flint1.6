@@ -105,7 +105,7 @@ typedef void (*sighandler_t)(int);
 
 void handler(int varn){
 
-    printf("I've been handled\n");
+//    printf("I've been handled\n");
     global_flag++;
 
     return;
@@ -3238,6 +3238,10 @@ int LLL_mpfr_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
 #if PROFILE
       printf("mpfr LLL with prec = %ld\n", prec);
 #endif
+//wacky stuff here
+      if (prec > 106){
+         return 23;
+      }
       result = LLL_mpfr2_with_removal(B, prec, gs_B);
       if (result == -1){
          if (num_loops < 20)
@@ -3302,9 +3306,10 @@ int knapsack_LLL_wrapper_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
    if (res == -1)
    { 
 	  // Now try the mpfr version
-      printf("called mpfr!!\n");
-      F_mpz_mat_print_pretty(B);
-      abort();
+//      printf("called mpfr!!\n");
+//      F_mpz_mat_print_pretty(B);
+//      return 23;
+//      abort();
 #if PROFILE
       printf("called mpfr!!\n");
 #endif
@@ -4874,14 +4879,17 @@ int U_LLL_with_removal(F_mpz_mat_t FM, long new_size, F_mpz_t gs_B)
          timer2 = clock();
          fprintf(stderr, " spent a total of %f seconds in ULLL\n", (double) (timer2 - timer1) / (double) CLOCKS_PER_SEC);
 
-         if (global_flag > 0){
+         if ((global_flag > 0) || (newd == 23)){
 
             F_mpz_mat_print_pretty(full_data);
             fflush(stdout);
             global_flag = 0;
 
+            if (newd == 23)
+                abort();
+
          }
-         
+
          // make this condition better?
          if ((mbits - new_size > 0) &&  (mbits <= prev_mbits - (long)(new_size/4)) && is_U_I == 0)
 		 {
@@ -5050,7 +5058,7 @@ int k_U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_
 #if PROFILE
          lll_start = clock();
 #endif
-		 knapsack_LLL_wrapper_with_removal(big_FM, gs_B);
+		 newd = knapsack_LLL_wrapper_with_removal(big_FM, gs_B);
 #if PROFILE
          lll_stop = clock();
 #endif
@@ -5091,11 +5099,14 @@ int k_U_LLL_with_removal(F_mpz_mat_t FM, long new_size, long u_size, F_mpz_t gs_
          timer2 = clock();
          fprintf(stderr, " spent a total of %f seconds in ULLL\n", (double) (timer2 - timer1) / (double) CLOCKS_PER_SEC);
 
-         if (global_flag > 0){
+         if ((global_flag > 0) || (newd == 23)){
 
             F_mpz_mat_print_pretty(full_data);
             fflush(stdout);
             global_flag = 0;
+
+            if (newd == 23)
+                abort();
 
          }
          
