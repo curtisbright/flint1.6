@@ -13,7 +13,6 @@
 #include "F_mpz_LLL.h"
 #include "memory-manager.h"
 #include "test-support.h"
-#include "F_mpz_LLL_wrapper.h"
 
 void _mpfr_vec_clean_scalar_product2(mpfr_t sp, __mpfr_struct * vec1, __mpfr_struct * vec2, int n, mp_prec_t prec)
 {
