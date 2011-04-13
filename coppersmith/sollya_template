@@ -1,0 +1,36 @@
+k1 = ceil(log(F(c))/log(2));
+k2 = floor(log(F(c))/log(2));
+if (k1 == k2) then {print("rare break point for c, treat by hand\n"); quit;};
+f=F(x + c)/2^k1;
+TL=taylorform(f,d,0);
+g=TL[0]-f;
+Zers=dirtyfindzeros(abs(g)-2^(-pp-1),[-.1,.1]);
+if (length(Zers)==0) then {Zers=dirtyfindzeros(abs(g)-2^(-pp-1),[-.05,.05]);};
+if (length(Zers)==0) then {print("no radius found"); quit;};
+x0 = floor(abs((Zers[0]*2^p)));
+r = x0/2^p;
+tp=TL[0];
+t=floor( log( dirtyinfnorm( TL[0] - f(x), [-r,r]) ) / log(2) ) + 1;
+if (t > -pp) then {print("not a large enough degree\n"); quit;};
+tp=tp(x/2^(p));
+rtp = 0; 
+for i in [|0,...,d|] do {
+   temp = round(coeff(tp,i),abs(t)+10,RD);
+   rtp = rtp + temp*x^i;
+};
+
+ed = abs(exponent(coeff(rtp,d)));
+
+print(p*(d-1) + ed, x0, p*d + ed - pp + 1);
+
+//re=supnorm(rtp,f(x/2^p),[-r*2^p,r*2^p],absolute,2^(-pp));
+//if (sup(re) > 2^(-pp)) then {print("rtp isn't accurate enough");};
+
+itp = 0;
+for i in [|0,...,d|] do {
+   temp = coeff(rtp,i);
+   temp = temp*2^(p*(d-1) + ed);
+   print(mantissa(temp),exponent(temp));
+   itp = itp + temp*x^i;
+};
+
