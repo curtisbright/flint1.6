@@ -102,7 +102,7 @@ def cop(c, alpha):
    lngstr = f.read()
    f.close()
 #here we can adjust the inputs, the elementary function, the center of the interval, desirted taylor degree, target floating point precision, and pp is the error precision
-   Fs='exp(x)'
+   Fs='cos(x)'
    cs=str(c)
    d=7
    p=53

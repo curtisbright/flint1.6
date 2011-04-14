@@ -162,8 +162,8 @@ int check_Babai (int kappa, F_mpz_mat_t B, double **mu, double **r, double *s,
    
    aa = (a > zeros) ? a : zeros + 1;
   
-   ctt = (4*DELTA + 1)/5;
-   halfplus = (4*ETA + .5)/5 ;
+   ctt = (3*DELTA + 1)/4;
+   halfplus = (3*ETA + .5)/4 ;
    onedothalfplus = 1.0+halfplus;
 
    long loops = 0;
@@ -484,8 +484,8 @@ int check_Babai_heuristic_d (int kappa, F_mpz_mat_t B, double **mu, double **r, 
    
    aa = (a > zeros) ? a : zeros + 1;
   
-   ctt = (4*DELTA + 1)/5;
-   halfplus = (4*ETA + .5)/5 ;
+   ctt = (3*DELTA + 1)/4;
+   halfplus = (3*ETA + .5)/4 ;
    onedothalfplus = 1.0+halfplus;
 
    int loops = 0;
@@ -841,8 +841,8 @@ int check_Babai_heuristic(int kappa, F_mpz_mat_t B, __mpfr_struct **mu, __mpfr_s
    
    aa = (a > zeros) ? a : zeros + 1;
   
-   ctt = (4*DELTA + 1)/5;
-   halfplus = (4*ETA + .5)/5 ;
+   ctt = (3*DELTA + 1)/4;
+   halfplus = (3*ETA + .5)/4 ;
    onedothalfplus = 1.0+halfplus;
 
    long loops = 0;
@@ -3354,8 +3354,8 @@ int knapsack_LLL_d_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
    d = B->r;
    D = d;
 
-   ctt = (4*DELTA + 1)/5;
-   halfplus = (4*ETA + .5)/5 ;
+   ctt = (3*DELTA + 1)/4;
+   halfplus = (3*ETA + .5)/4 ;
    onedothalfplus = 1.0+halfplus;
 	
    alpha = (int *) malloc(d * sizeof(int)); 
@@ -3724,8 +3724,8 @@ int knapsack_LLL_d_heuristic_with_removal(F_mpz_mat_t B, F_mpz_t gs_B)
    n = B->c;
    d = B->r;
 
-   ctt = (4*DELTA + 1)/5;
-   halfplus = (4*ETA + .5)/5 ;
+   ctt = (3*DELTA + 1)/4;
+   halfplus = (3*ETA + .5)/4 ;
    onedothalfplus = 1.0+halfplus;
 	
    alpha = (int *) malloc(d * sizeof(int)); 
@@ -3948,8 +3948,8 @@ int knapsack_LLL_mpfr2_with_removal(F_mpz_mat_t B, mp_prec_t prec, F_mpz_t gs_B)
    d = B->r;
    D = d;
 
-   ctt = (4*DELTA + 1)/5;
-   halfplus = (4*ETA + .5)/5 ;
+   ctt = (3*DELTA + 1)/4;
+   halfplus = (3*ETA + .5)/4 ;
    onedothalfplus = 1.0+halfplus;
 	
    alpha = (int *) malloc((d + 1) * sizeof(int)); 
