@@ -807,6 +807,28 @@ int check_Babai_heuristic_d (int kappa, F_mpz_mat_t B, double **mu, double **r, 
 
 /* The mpfr version of check_Babai_heuristic_d, also inherits some temp variables.*/
 
+void _mpfr_vec_clean_scalar_product2(mpfr_t sp, __mpfr_struct * vec1, __mpfr_struct * vec2, int n, mp_prec_t prec)
+{
+   if (n <= 1){
+      mpfr_mul(sp, vec1, vec2, GMP_RNDN);
+      return;
+   }
+   mpfr_t tmp;
+   mpfr_init2(tmp, prec);
+  
+   mpfr_mul(sp, vec1, vec2, GMP_RNDN);
+
+   for (long i = 1; i < n; i++)
+   {
+      mpfr_mul(tmp, vec1 + i, vec2 + i, GMP_RNDN);
+      mpfr_add(sp, sp, tmp, GMP_RNDN);
+   }
+
+   mpfr_clear(tmp);
+
+   return;
+}
+
 int check_Babai_heuristic(int kappa, F_mpz_mat_t B, __mpfr_struct **mu, __mpfr_struct **r, __mpfr_struct *s, 
        __mpfr_struct **appB, __mpfr_struct **appSP, 
        int a, int zeros, int kappamax, int n, mpfr_t tmp, mpfr_t rtmp, mp_prec_t prec)
@@ -840,34 +862,36 @@ int check_Babai_heuristic(int kappa, F_mpz_mat_t B, __mpfr_struct **mu, __mpfr_s
 	  {	  
 	      if ( mpfr_nan_p(appSP[kappa] + j) ) // if appSP[kappa] + j == NAN
 	      {
-              if (!(_mpfr_vec_scalar_product2(appSP[kappa] + j, appB[kappa], appB[j], n, prec) ) ){
+             _mpfr_vec_clean_scalar_product2(appSP[kappa] + j, appB[kappa], appB[j], n, prec);
+/*              if (!(_mpfr_vec_scalar_product2(appSP[kappa] + j, appB[kappa], appB[j], n, prec) ) )
+              {
 //In this case a heuristic told us that some cancelation probably happened so we just compute the scalar product at full precision
-               _F_mpz_vec_scalar_product(ztmp, B->rows[kappa], B->rows[j], n);
-               F_mpz_get_mpfr(appSP[kappa] + j, ztmp);
-          }
-	  }
+                 _F_mpz_vec_scalar_product(ztmp, B->rows[kappa], B->rows[j], n);
+                 F_mpz_get_mpfr(appSP[kappa] + j, ztmp);
+              }*/
+	      }
       
-      if (j > zeros + 2)
-	  {
-	      mpfr_mul(tmp, mu[j] + zeros + 1, r[kappa] + zeros + 1, GMP_RNDN);
-	      mpfr_sub(rtmp, appSP[kappa] + j, tmp, GMP_RNDN);
+          if (j > zeros + 2)
+	      {
+	        mpfr_mul(tmp, mu[j] + zeros + 1, r[kappa] + zeros + 1, GMP_RNDN);
+	        mpfr_sub(rtmp, appSP[kappa] + j, tmp, GMP_RNDN);
 	      
-		  for (k = zeros + 2; k < j - 1; k++)
-		  {
+		    for (k = zeros + 2; k < j - 1; k++)
+		    {
 		       mpfr_mul(tmp, mu[j] + k, r[kappa] + k, GMP_RNDN);
 		       mpfr_sub(rtmp, rtmp, tmp, GMP_RNDN);
-		  }
+		    }
 	      
-		  mpfr_mul(tmp, mu[j] + j - 1, r[kappa] + j - 1, GMP_RNDN);
-	      mpfr_sub(r[kappa] + j, rtmp, tmp, GMP_RNDN);
-       } else if (j == zeros+2)
-	   {
-	      mpfr_mul(tmp, mu[j] + zeros + 1, r[kappa] + zeros + 1, GMP_RNDN);
-	      mpfr_sub(r[kappa] + j, appSP[kappa] + j, tmp, GMP_RNDN);
-	   } else mpfr_set(r[kappa] + j, appSP[kappa] + j, GMP_RNDN);
+		    mpfr_mul(tmp, mu[j] + j - 1, r[kappa] + j - 1, GMP_RNDN);
+	        mpfr_sub(r[kappa] + j, rtmp, tmp, GMP_RNDN);
+          } else if (j == zeros+2)
+	      {
+	        mpfr_mul(tmp, mu[j] + zeros + 1, r[kappa] + zeros + 1, GMP_RNDN);
+	        mpfr_sub(r[kappa] + j, appSP[kappa] + j, tmp, GMP_RNDN);
+	      } else mpfr_set(r[kappa] + j, appSP[kappa] + j, GMP_RNDN);
 
-	   mpfr_div(mu[kappa] + j, r[kappa] + j, r[j] + j, GMP_RNDN);
-   }
+	      mpfr_div(mu[kappa] + j, r[kappa] + j, r[j] + j, GMP_RNDN);
+      }
       
    /* **************************** */
    /* Step3--5: compute the X_j's  */
