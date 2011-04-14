@@ -102,11 +102,11 @@ def cop(c, alpha):
    lngstr = f.read()
    f.close()
 #here we can adjust the inputs, the elementary function, the center of the interval, desirted taylor degree, target floating point precision, and pp is the error precision
-   Fs='cos(x)'
+   Fs='exp(x)'
    cs=str(c)
    d=7
    p=53
-   pp=110
+   pp=100
 #so 2^p is the target floating point precision, and pp is the range of value we are checking for in coppersmith's method
 # we need to find a polynomial such that infnorm of f - P in a small interval around c will be smaller than 
 # 2^pp, then we consider all intgers/2^p.  24 and 40 would make a small-scale version of TaMaDi, 53,110 would be the double precision table makers problem 
@@ -142,7 +142,7 @@ def cop(c, alpha):
 #gcc flint_copper.c -o copper_prog -std=c99 -lmpfr -lmpir -lflint -Wl,-rpath,/home/andy/Desktop/andy_flint
 #./copper_prog alpha xp yp < pol_mod
    #alpha = 3
-   ypow = d*(alpha) + 1
+   print "ypow is",d*(alpha) + 1
    os.system('./copper_prog '+str(alpha)+' '+str(xp)+' '+str(yp)+' < pol_mod')
    return M_in('pre_LLL')
 
@@ -155,4 +155,17 @@ def M_out(M, fstr):
    f=file(fstr,'w')
    f.write(lngstr)
    f.close()
+
+S.<x,y>=PolynomialRing(ZZ)
+def poly_in(fin, ypow):
+   f=file(fin,'r')
+   lngstr=f.read()
+   f.close()
+   k = lngstr.find('  ')
+   lngstr=lngstr[k+2:]
+   L=list(eval(lngstr.replace(' ',',')))
+   P=0
+   for i in range(len(L)):
+      P = P + L[i]*x^(i%ypow)*y^(floor(i/ypow))
+   return P
 

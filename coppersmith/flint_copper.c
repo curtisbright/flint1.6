@@ -183,6 +183,31 @@ int main(int argc, char * argv[]){
    F_mpz_poly_fprint(temp, fpoly2);
    fclose(fpoly2);
 
+   F_mpz_poly_clear(temp);
+   F_mpz_poly_init(temp);
+
+   for (i = 0; i < maxlength; i++){
+      F_mpz_poly_set_coeff(temp, i, M->rows[2]+i);
+      F_mpz_divexact(temp->coeffs + i, temp->coeffs + i, col_scale->rows[i] + i); //undo col_scale
+   }
+
+   FILE * fpoly3 = fopen("poly3","w");
+   F_mpz_poly_fprint(temp, fpoly3);
+   fclose(fpoly3);
+//   F_mpz_poly_print(temp); printf(" was the first row after LLL as a polynomial\n");
+
+   F_mpz_poly_clear(temp);
+   F_mpz_poly_init(temp);
+
+   for (i = 0; i < maxlength; i++){
+      F_mpz_poly_set_coeff(temp, i, M->rows[3]+i);
+      F_mpz_divexact(temp->coeffs + i, temp->coeffs + i, col_scale->rows[i] + i);
+   }
+//   F_mpz_poly_print(temp); printf(" was the second row after LLL as a polynomial\n"); //undo col_scale
+   FILE * fpoly4 = fopen("poly4","w");
+   F_mpz_poly_fprint(temp, fpoly4);
+   fclose(fpoly4);
+
    F_mpz_clear(X);
    F_mpz_clear(Y);
    F_mpz_clear(Modulus);
