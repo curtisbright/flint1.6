@@ -2,6 +2,9 @@ k1 = ceil(log(F(c))/log(2));
 k2 = floor(log(F(c))/log(2));
 if (k1 == k2) then {print("rare break point for c, treat by hand\n"); quit;};
 f=F(x + c)/2^k1;
+//hope this fixes normalization problem
+p = p + k1;
+pp = pp + k1;
 TL=taylorform(f,d,0);
 g=TL[0]-f;
 Zers=dirtyfindzeros(abs(g)-2^(-pp-1),[-.1,.1]);
