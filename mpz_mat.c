@@ -331,7 +331,7 @@ int mpz_mat_fread_pretty(mpz_mat_t mat, FILE* f)
    fseek(f,0,SEEK_END);
    f_size = ftell(f);
    rewind(f);
-   s = (char *)malloc(sizeof(char)*f_size+5);   
+   s = (char *)malloc(sizeof(char)*f_size+5);
 
 
    c = fgetc(f);
@@ -344,6 +344,8 @@ int mpz_mat_fread_pretty(mpz_mat_t mat, FILE* f)
    s[lof] = 0;
 
    ok = mpz_mat_from_string_pretty(mat, s);
+
+   free(s);
 
    return ok;
 }
