@@ -106,7 +106,7 @@ def cop(c, alpha):
    cs=str(c)
    d=7
    p=53
-   pp=100
+   pp=90
 #so 2^p is the target floating point precision, and pp is the range of value we are checking for in coppersmith's method
 # we need to find a polynomial such that infnorm of f - P in a small interval around c will be smaller than 
 # 2^pp, then we consider all intgers/2^p.  24 and 40 would make a small-scale version of TaMaDi, 53,110 would be the double precision table makers problem 
@@ -146,6 +146,55 @@ def cop(c, alpha):
    os.system('./copper_prog '+str(alpha)+' '+str(xp)+' '+str(yp)+' < pol_mod')
    return M_in('pre_LLL')
 
+def copx(c, alpha, xb):
+   f=file('sollya_template', 'r')
+   lngstr = f.read()
+   f.close()
+#here we can adjust the inputs, the elementary function, the center of the interval, desirted taylor degree, target floating point precision, and pp is the error precision
+   Fs='exp(x)'
+   cs=str(c)
+   d=7
+   p=53
+   pp=90
+#so 2^p is the target floating point precision, and pp is the range of value we are checking for in coppersmith's method
+# we need to find a polynomial such that infnorm of f - P in a small interval around c will be smaller than 
+# 2^pp, then we consider all intgers/2^p.  24 and 40 would make a small-scale version of TaMaDi, 53,110 would be the double precision table makers problem 
+   instr='F=' + Fs + ';\nc=' + cs + ';\nd=' + str(d) + ';\np=' + str(p) + ';\npp=' + str(pp) + ';\n'
+
+   f=file('taylor_poly.sollya', 'w')
+   f.write(instr+lngstr)
+   f.close()
+#in future we could approximate a cap between polynomials not f and the poly
+   os.system('sollya < taylor_poly.sollya > tay_pol')
+
+   f=file('tay_pol', 'r')
+   lngstr = f.read()
+   f.close()
+
+   L=lngstr.split()
+   modulus = 2^int(L[0])
+   xp=floor(R(log(int(L[1]))/log(2)))
+   yp=int(L[2])
+   P=str(d+1)+' '
+   for i in range(3, len(L), 2):
+      P = P + ' ' + str( sage.rings.integer.Integer( L[i] ) * 2^( int( L[i+1] ) ) )
+
+   f=file('pol_in','w')
+   f.write(P)
+   f.close()
+
+   f=file('pol_mod','w')
+   f.write(str(modulus))
+   f.close()
+   print("modulus power = " + L[0] + " xbound, ybound " + str(xb) + ", " + str(yp))
+
+#gcc flint_copper.c -o copper_prog -std=c99 -lmpfr -lmpir -lflint -Wl,-rpath,/home/andy/Desktop/andy_flint
+#./copper_prog alpha xp yp < pol_mod
+   #alpha = 3
+   print "ypow is",d*(alpha) + 1
+   os.system('./copper_prog '+str(alpha)+' '+str(xb)+' '+str(yp)+' < pol_mod')
+   return M_in('pre_LLL')
+
 def M_out(M, fstr):
    lngstr = str(M.rows())
    lngstr=lngstr.replace(' ','')
@@ -167,5 +216,11 @@ def poly_in(fin, ypow):
    P=0
    for i in range(len(L)):
       P = P + L[i]*x^(i%ypow)*y^(floor(i/ypow))
+   return P
+
+def poly_row(M, i, ypow):
+   P=0
+   for j in range(M.ncols()):
+      P = P + M[i][j]*x^(j%ypow)*y^(floor(j/ypow))
    return P
 
