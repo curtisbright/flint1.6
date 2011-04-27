@@ -165,7 +165,7 @@ def copx(c, alpha, xb):
    f.write(instr+lngstr)
    f.close()
 #in future we could approximate a cap between polynomials not f and the poly
-   os.system('sollya < taylor_poly.sollya > tay_pol')
+   os.system('sollya < taylor_poly.sollya > output')
 
    f=file('tay_pol', 'r')
    lngstr = f.read()

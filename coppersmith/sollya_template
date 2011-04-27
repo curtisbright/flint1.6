@@ -29,15 +29,15 @@ ed = abs(exponent(coeff(rtp,d)));
 //testing a theory
 rtp=rtp(x/2^(p));
 
-print(p*d + ed - p - k1, x0, p*d + ed - pp - k1 + 1);
+print(p*d + ed - p - k1, x0, p*d + ed - pp - k1 + 1) > "tay_pol";
 
 //re=supnorm(rtp,f(x/2^p),[-r*2^p,r*2^p],absolute,2^(-pp - k1));
 //if (sup(re) > 2^(-pp - k1)) then {print("rtp isn't accurate enough");};
-
+display = powers;
 itp = 0;
 for i in [|0,...,d|] do {
    temp = coeff(rtp,i);
    temp = temp*2^(p*d + ed);
-   print(mantissa(temp),exponent(temp));
+   print(mantissa(temp),exponent(temp)) >> "tay_pol";
    itp = itp + temp*x^i;
 };
