@@ -148,7 +148,7 @@ def copx(c, alpha, xb):
 
 #copx_auto returns all the pertinent data
 #M,modulus,alpha,X,Y,ypow=copx_auto(c,alpha,xb, d)
-def copx_auto(c, alpha, xb, d):
+def copx_auto(c, alpha, xb, d, pp):
    f=file('sollya_template', 'r')
    lngstr = f.read()
    f.close()
@@ -156,7 +156,6 @@ def copx_auto(c, alpha, xb, d):
    Fs='exp(x)'
    cs=str(c)
    p=53
-   pp=90
 #so 2^p is the target floating point precision, and pp is the range of value we are checking for in coppersmith's method
 # we need to find a polynomial such that infnorm of f - P in a small interval around c will be smaller than 
 # 2^pp, then we consider all intgers/2^p.  24 and 40 would make a small-scale version of TaMaDi, 53,110 would be the double precision table makers problem 
