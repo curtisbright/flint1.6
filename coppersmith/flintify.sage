@@ -236,3 +236,69 @@ def test_M(M,ypow,X,Y):
    f=p1.resultant(p2,y)
    f=f.univariate_polynomial()
    return f.factor()
+
+def rec_pp_finder(alpha,d,pp,delta):
+   #assume that works for pp and not pp + delta * 2
+   failed = 0
+   try:
+      M,modulus,alpha,X,Y,ypow=copx_auto(c,alpha,5,d,pp + delta)
+      pp = pp + delta
+   except:
+      failed = 1
+   if (delta == 1):
+      return pp
+   else:
+      return rec_pp_finder(alpha, d, pp, delta/2)
+
+def pp_finder(c,alpha,d):
+   pp = 53
+   delta = 256
+   failed = 0
+   try:
+      M,modulus,alpha,X,Y,ypow=copx_auto(c,alpha,5,d,pp)
+   except:
+      failed = 1
+   if (failed == 1):
+      return -1
+   try:
+      M,modulus,alpha,X,Y,ypow=copx_auto(c,alpha,5,d,pp + delta)
+      failed = 2
+   except:
+      failed = 1
+   if (failed == 2):
+      return (pp + delta)
+   return rec_pp_finder(alpha, d, pp, delta/2)
+
+def lat_test(c,alpha,xb,d,pp):
+   M,modulus,alpha,X,Y,ypow=copx_auto(c,alpha,xb,d,pp)
+   T=M_in('post_LLL');
+   return (R(abs(M[0])/abs(T[0])) > 1.01)
+
+def rec_max_interval(c,alpha,d,pp,xb,delta):
+   #assume that xb works xb + 2*delta fails
+   print 'testing',xb + delta
+   failed = 0
+   if lat_test(c,alpha,xb + delta,d,pp):
+      xb = xb + delta
+   else:
+      failed = 1
+   if (delta == 1):
+      return xb
+   else:
+      return rec_max_interval(c,alpha,d,pp,xb,delta/2)
+
+def max_interval(c,alpha,d,pp):
+   xb = 0
+   delta = 64
+   if not lat_test(c,alpha,xb,d,pp):
+      return -1
+   if lat_test(c,alpha,xb + delta, d, pp):
+      return xb + delta
+   return rec_max_interval(c,alpha,d,pp,xb,delta/2)
+
+def alpha_d_test(c, alpha, d):
+   pp = pp_finder(c,alpha,d)
+   if (pp < 0):
+      return -1,-1
+   xb = max_interval(c,alpha,d,pp)
+   return pp,xb

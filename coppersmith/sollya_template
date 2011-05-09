@@ -5,17 +5,17 @@ f=F(x + c)/2^k1;
 //hope this fixes normalization problem
 //p = p + k1;
 //pp = pp + k1;
+prec = 500;
 TL=taylorform(f,d,0);
-g=TL[0]-f;
-Zers=dirtyfindzeros(abs(g)-2^(-pp -k1 - 1),[-.1,.1]);
-if (length(Zers)==0) then {Zers=dirtyfindzeros(abs(g)-2^(-pp -k1 - 1),[-.05,.05]);};
-if (length(Zers)==0) then {print("no radius found") > "tay_pol"; quit;};
-x0 = floor(abs((Zers[0]*2^p)));
-r = x0/2^p;
 tp=TL[0];
-t=floor( log( dirtyinfnorm( TL[0] - f(x), [-r,r]) ) / log(2) ) + 1;
-if (t > -pp - k1) then {print("not a large enough degree\n") > "tay_pol"; quit;};
-
+//I5=supnorm(tp,f,[-2^(5 - p), 2^(5 - p)],absolute,2^(-5));
+//I15=supnorm(tp,f,[-2^(15 - p), 2^(15 - p)],absolute,2^(-5));
+I25=supnorm(tp,f,[-2^(25 - p), 2^(25 - p)],absolute,2^(-5));
+//I35=supnorm(tp,f,[-2^(35 - p), 2^(35 - p)],absolute,2^(-5));
+//I45=supnorm(tp,f,[-2^(45 - p), 2^(45 - p)],absolute,2^(-5));
+if (sup(I25) > 2^(-pp - k1 - 1) ) then {print("no radius found") > "tay_pol"; quit;};
+x0 = 2^25;
+t = -pp - k1 - 1;
 //tp=tp(x/2^p);
 
 rtp = 0; 
