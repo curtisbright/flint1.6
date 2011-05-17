@@ -155,7 +155,7 @@ def copx_auto(c, alpha, xb, d, pp):
 #here we can adjust the inputs, the elementary function, the center of the interval, desirted taylor degree, target floating point precision, and pp is the error precision
    Fs='exp(x)'
    cs=str(c)
-   p=53
+   p=113
 #so 2^p is the target floating point precision, and pp is the range of value we are checking for in coppersmith's method
 # we need to find a polynomial such that infnorm of f - P in a small interval around c will be smaller than 
 # 2^pp, then we consider all intgers/2^p.  24 and 40 would make a small-scale version of TaMaDi, 53,110 would be the double precision table makers problem 
@@ -331,6 +331,7 @@ def msb(M, k):
    msbM=matrix(r,c,L)
    return I,msbM,J,mden
 
+#the three intuition building lines at the moment
 #M,modulus,alpha,X,Y,ypow=copx_auto((2^53 + 2^32)/2^53,4,32,12,300)
 #rI,rowM1,rJ,mden=msb(M,250);P=rJ*rowM1;I=identity_matrix(P.nrows());IP=I.augment(P)
 #TP=IP.LLL(delta=.75,eta=.81,algorithm='fpLLL:wrapper');U=TP.submatrix(0,0,TP.nrows(),TP.nrows());T=U*M;R(abs(T[0]));R(abs(M[0]))
