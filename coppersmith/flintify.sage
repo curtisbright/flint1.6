@@ -159,7 +159,7 @@ def copx_auto(c, alpha, xb, d, pp):
 #so 2^p is the target floating point precision, and pp is the range of value we are checking for in coppersmith's method
 # we need to find a polynomial such that infnorm of f - P in a small interval around c will be smaller than 
 # 2^pp, then we consider all intgers/2^p.  24 and 40 would make a small-scale version of TaMaDi, 53,110 would be the double precision table makers problem 
-   instr='F=' + Fs + ';\nc=' + cs + ';\nd=' + str(d) + ';\np=' + str(p) + ';\npp=' + str(pp) + ';\n'
+   instr='F=' + Fs + ';\nc=' + cs + ';\nd=' + str(d) + ';\np=' + str(p) + ';\npp=' + str(pp) + ';\nxb='+str(xb)+';\n'
 
    f=file('taylor_poly.sollya', 'w')
    f.write(instr+lngstr)
