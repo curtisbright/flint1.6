@@ -237,6 +237,16 @@ def test_M(M,ypow,X,Y):
    f=f.univariate_polynomial()
    return f.factor()
 
+def test_T(T,ypow,X,Y,i,j):
+   print R(abs(T[0])), "should be smaller than:\n", R(abs(M[0]))
+   p1 = poly_row(T,i,ypow)
+   p1 = S(p1(x/X,y/Y))
+   p2 = poly_row(T,j,ypow)
+   p2 = S(p2(x/X,y/Y))
+   f=p1.resultant(p2,y)
+   f=f.univariate_polynomial()
+   return f.factor()
+
 def rec_pp_finder(alpha,d,pp,delta):
    #assume that works for pp and not pp + delta * 2
    failed = 0
