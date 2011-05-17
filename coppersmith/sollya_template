@@ -11,7 +11,7 @@ tp=TL[0];
 //I5=supnorm(tp,f,[-2^(5 - p), 2^(5 - p)],absolute,2^(-5));
 //I15=supnorm(tp,f,[-2^(15 - p), 2^(15 - p)],absolute,2^(-5));
 //I25=supnorm(tp,f,[-2^(25 - p), 2^(25 - p)],absolute,2^(-5));
-I35=supnorm(tp,f,[-2^(32 - p), 2^(32 - p)],absolute,2^(-5));
+I35=supnorm(tp,f,[-2^(21 - p), 2^(21 - p)],absolute,2^(-5));
 //I45=supnorm(tp,f,[-2^(45 - p), 2^(45 - p)],absolute,2^(-5));
 if (sup(I35) > 2^(-pp - k1 - 1) ) then {print("no radius found") > "tay_pol"; quit;};
 x0 = 2^28;
