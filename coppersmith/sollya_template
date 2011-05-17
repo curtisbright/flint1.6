@@ -26,8 +26,8 @@ for i in [|0,...,d|] do {
 
 ed = abs(exponent(coeff(rtp,d)));
 
-print(ed) >> "ed_file";
-ed = 370;
+//print(ed) >> "ed_file";
+//ed = 370;
 //testing a theory
 rtp=rtp(x/2^(p));
 

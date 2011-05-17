@@ -320,3 +320,8 @@ def msb(M, k):
       J[i,i]=2^(I[i,i]-mden)
    msbM=matrix(r,c,L)
    return I,msbM,J,mden
+
+#M,modulus,alpha,X,Y,ypow=copx_auto((2^53 + 2^32)/2^53,4,32,12,300)
+#rI,rowM1,rJ,mden=msb(M,250);P=rJ*rowM1;I=identity_matrix(P.nrows());IP=I.augment(P)
+#TP=IP.LLL(delta=.75,eta=.81,algorithm='fpLLL:wrapper');U=TP.submatrix(0,0,TP.nrows(),TP.nrows());T=U*M;R(abs(T[0]));R(abs(M[0]))
+
