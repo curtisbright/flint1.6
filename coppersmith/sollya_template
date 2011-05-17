@@ -5,7 +5,7 @@ f=F(x + c)/2^k1;
 //hope this fixes normalization problem
 //p = p + k1;
 //pp = pp + k1;
-prec = 1000;
+prec = 1500;
 TL=taylorform(f,d,0);
 tp=TL[0];
 //I5=supnorm(tp,f,[-2^(5 - p), 2^(5 - p)],absolute,2^(-5));
