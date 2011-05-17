@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "flint.h"
+#include "F_mpz_mat.h"
 #include "F_mpz_LLL.h"
 
 int main(int argc, char * argv[]){
