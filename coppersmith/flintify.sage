@@ -302,3 +302,21 @@ def alpha_d_test(c, alpha, d):
       return -1,-1
    xb = max_interval(c,alpha,d,pp)
    return pp,xb
+
+def msb(M, k):
+   r=M.nrows()
+   c=M.ncols()
+   I=identity_matrix(r)
+   L=[]
+   mden = ceil(R(log(M.height(),2)))
+   for i in range(r):
+      V=M.submatrix(i,0,1,c)
+      I[i,i]=ceil(R(log(V.height(),2)))-k
+      if (I[i,i] < mden):
+         mden = I[i,i]
+      L.extend([floor(j/2^(I[i,i])) for j in V.list()])
+   J=identity_matrix(r)
+   for i in range(r):
+      J[i,i]=2^(I[i,i]-mden)
+   msbM=matrix(r,c,L)
+   return I,msbM,J,mden
