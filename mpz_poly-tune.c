@@ -63,7 +63,7 @@ void sample_kara(void* arg, unsigned long count)
    for (i = 0; i < 6*length; i++)
       mpz_init2(buf[i], 3*limbs*FLINT_BITS);
       
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < 2*length; i++)
       // (leave a few zero high bits to prevent carries in the multiplication)
       mpz_urandomb(buf[i], randstate, limbs*FLINT_BITS - FLINT_BITS/3);
@@ -74,20 +74,20 @@ void sample_kara(void* arg, unsigned long count)
    mpz_t* scratch = out + length;
 
    // warm up
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < count/4; i++)
       _mpz_poly_mul_kara_recursive(out, in1, length, in2, length,
                                    scratch, 1, crossover);
 
    // time it
    start_clock(0);
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < count; i++)
       _mpz_poly_mul_kara_recursive(out, in1, length, in2, length,
                                    scratch, 1, crossover);
    stop_clock(0);
 
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < 6*length; i++)
       mpz_clear(buf[i]);
    free(buf);

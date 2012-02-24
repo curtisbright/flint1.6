@@ -93,7 +93,7 @@ static inline void square_root(mpz_t X, mpz_t Y, QS_t * qs_inf, linalg_t * la_in
    }
    mpz_mod(Y, Y, N);
    
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < num_primes; i++)
    {
       if (prime_count[i]) 

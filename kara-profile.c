@@ -68,7 +68,7 @@ void target(void* y, unsigned long count)
    }
    mpz_poly_to_fmpz_poly(in1f, in1);
 
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < arg->length2; i++)
    {
       mpz_urandomb(x, randstate, arg->bits2);

@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
    long stop = (long) ceil((-1.0 + sqrt(1.0 + 8.0*N)) / 2.0);
    
-   long i;
+   //long i;
    for (i = 0; i <= stop; i++)
    {
       long index1 = i*(i+1)/2;
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
    
    fmpz_poly_fit_length(F2, N);
    
-   long i;
+   //long i;
    for (i = 0; i < N; i++)
       fmpz_poly_set_coeff_si(F2, i, values[i]);
 

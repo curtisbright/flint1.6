@@ -89,7 +89,7 @@ void sample_mul(void* arg, unsigned long count)
       
    // time it
    start_clock(0);
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < count; i++)
       ZmodF_mul_info_mul(info, out, in1, in2);
    stop_clock(0);

@@ -63,7 +63,7 @@ void sample_mpz_poly_mul_karatsuba_mixlengths(
       if (random_ulong(2)) mpz_neg(x, x);
       mpz_poly_set_coeff(poly1, i, x);
    }
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < len2; i++)
    {
       mpz_urandomb(x, randstate, bits);
@@ -74,7 +74,7 @@ void sample_mpz_poly_mul_karatsuba_mixlengths(
    
    prof_start();
 
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < count; i++)
       mpz_poly_mul_karatsuba(poly3, poly1, poly2);
 
@@ -110,9 +110,10 @@ void profDriver_mpz_poly_mul_karatsuba_mixlengths(char* params)
 
    unsigned long len1;
    for (len1 = skip; len1 <= max_length; len1 += skip)
-      unsigned long len2;
+   {  unsigned long len2;
       for (len2 = skip; len2 <= len1; len2 += skip)
          prof2d_sample(len1, len2, &bits);
+   }
 
    test_support_cleanup();
 }
@@ -146,14 +147,14 @@ void sample__mpz_poly_mul_kara_recursive_mixlengths(
 
    mpz_t x;
    mpz_init(x);
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < len1; i++)
    {
       mpz_urandomb(x, randstate, bits);
       if (random_ulong(2)) mpz_neg(x, x);
       mpz_poly_set_coeff(poly1, i, x);
    }
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < len2; i++)
    {
       mpz_urandomb(x, randstate, bits);
@@ -167,14 +168,14 @@ void sample__mpz_poly_mul_kara_recursive_mixlengths(
    
    prof_start();
 
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < count; i++)
       _mpz_poly_mul_kara_recursive(poly3->coeffs, poly1->coeffs, len1,
                                    poly2->coeffs, len2, scratch, 1, crossover);
 
    prof_stop();
 
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < scratch_len; i++)
       mpz_clear(scratch[i]);
    free(scratch);
@@ -209,9 +210,10 @@ void profDriver__mpz_poly_mul_kara_recursive_mixlengths(char* params)
 
    unsigned long len2;
    for (len2 = skip; len2 <= max_length; len2 += skip)
-      unsigned long len1;
+   {  unsigned long len1;
       for (len1 = skip; len1 <= len2; len1 += skip)
          prof2d_sample(len1, len2, &bits);
+   }
 
    test_support_cleanup();
 }

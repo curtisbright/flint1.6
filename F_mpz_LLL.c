@@ -807,7 +807,7 @@ int check_Babai_heuristic_d (int kappa, F_mpz_mat_t B, double **mu, double **r, 
 
 /* The mpfr version of check_Babai_heuristic_d, also inherits some temp variables.*/
 
-void _mpfr_vec_clean_scalar_product2(mpfr_t sp, __mpfr_struct * vec1, __mpfr_struct * vec2, int n, mp_prec_t prec)
+void _mpfr_vec_clean_scalar_product3(mpfr_t sp, __mpfr_struct * vec1, __mpfr_struct * vec2, int n, mp_prec_t prec)
 {
    if (n <= 1){
       mpfr_mul(sp, vec1, vec2, GMP_RNDN);
@@ -862,8 +862,8 @@ int check_Babai_heuristic(int kappa, F_mpz_mat_t B, __mpfr_struct **mu, __mpfr_s
 	  {	  
 	      if ( mpfr_nan_p(appSP[kappa] + j) ) // if appSP[kappa] + j == NAN
 	      {
-             _mpfr_vec_clean_scalar_product2(appSP[kappa] + j, appB[kappa], appB[j], n, prec);
-/*              if (!(_mpfr_vec_scalar_product2(appSP[kappa] + j, appB[kappa], appB[j], n, prec) ) )
+             _mpfr_vec_clean_scalar_product3(appSP[kappa] + j, appB[kappa], appB[j], n, prec);
+/*              if (!(_mpfr_vec_scalar_product3(appSP[kappa] + j, appB[kappa], appB[j], n, prec) ) )
               {
 //In this case a heuristic told us that some cancelation probably happened so we just compute the scalar product at full precision
                  _F_mpz_vec_scalar_product(ztmp, B->rows[kappa], B->rows[j], n);

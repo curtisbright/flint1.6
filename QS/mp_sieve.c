@@ -112,7 +112,7 @@ void do_sieving2(QS_t * qs_inf, poly_t * poly_inf, unsigned char * sieve)
       }
    }
    
-   unsigned long prime;
+   //unsigned long prime;
    for (prime = second_prime; prime < num_primes; prime++) 
    {
       p = factor_base[prime].p;
@@ -409,7 +409,7 @@ unsigned long evaluate_candidate(linalg_t * la_inf, QS_t * qs_inf, poly_t * poly
 #endif
    } else small[0] = 0;
    
-   unsigned long j;
+   //unsigned long j;
    for (j = 2; j < small_primes; j++) // pull out small primes
    {
       prime = factor_base[j].p;

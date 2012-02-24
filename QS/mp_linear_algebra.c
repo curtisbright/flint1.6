@@ -75,7 +75,7 @@ void linear_algebra_init(linalg_t * la_inf, QS_t * qs_inf, poly_t * poly_inf)
    {
       mpz_init2(Y_arr[i], prec);
    }
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < qs_inf->num_primes + EXTRA_RELS + 1000; i++) 
    {
       matrix[i].weight = 0;
@@ -100,13 +100,13 @@ void linear_algebra_clear(linalg_t * la_inf, QS_t * qs_inf)
       mpz_clear(Y_arr[i]);
    }
    
-	unsigned long i;
+	//unsigned long i;
 	for (i = 0; i < la_inf->columns; i++) // Clear all used columns
    {
 		free_col(matrix + i);
    }
    
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < la_inf->num_unmerged; i++) // Clear all used columns
    {
       free_col(unmerged + i);
@@ -331,7 +331,7 @@ unsigned long insert_lp_relation(QS_t * qs_inf, linalg_t * la_inf, poly_t * poly
    {
        if (small[i]) add_factor(&rel_ptr, (unsigned long) small[i], (unsigned long) i);
    }
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < num_factors; i++)
    {
        add_factor(&rel_ptr, (unsigned long) factor[i].exp, (unsigned long) factor[i].ind);
@@ -387,7 +387,7 @@ unsigned long insert_relation(QS_t * qs_inf, linalg_t * la_inf, poly_t * poly_in
           fac_num++;
        }
    }
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < num_factors; i++)
    {
        if (factor[i].exp & 1) insert_col_entry(unmerged + num_unmerged, factor[i].ind);

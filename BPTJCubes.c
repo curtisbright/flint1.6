@@ -114,7 +114,7 @@ int main()
       prime[i] = s;
       s = z_nextprime(s, 0);
    }
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < NUMPRIMES; i++)
    {
       s = (T%prime[i]);

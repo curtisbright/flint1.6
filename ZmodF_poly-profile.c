@@ -194,7 +194,7 @@ void sample_ZmodF_poly_negacyclic_convolution(
    
    prof_start();
 
-   unsigned long i;
+   //unsigned long i;
    for (i = 0; i < count; i++)
       ZmodF_poly_negacyclic_convolution(poly3, poly1, poly2);
 
