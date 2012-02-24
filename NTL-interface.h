@@ -34,6 +34,8 @@ Copyright (C) 2007, William Hart
 
 #include <NTL/ZZ.h>
 #include <NTL/ZZX.h>
+#include <NTL/vec_ZZ.h>
+#include <NTL/mat_ZZ.h>
 
 #include "flint.h"
 #include "F_mpz.h"
@@ -95,8 +97,8 @@ void mat_ZZ_to_F_mpz_mat(F_mpz_mat_t output, const mat_ZZ& mat);
 /*
    Convert an F_mpz_mat_t to an NTL mat_ZZ
 */
-
 void F_mpz_mat_to_mat_ZZ(mat_ZZ& output, const F_mpz_mat_t mat);
+
 
 #ifdef __cplusplus
  }

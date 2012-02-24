@@ -2,37 +2,35 @@ LIBDIR=$(PREFIX)/lib
 INCLUDEDIR=$(PREFIX)/include
 DOCDIR=$(PREFIX)/doc
 
-ifndef FLINT_CC
-	FLINT_CC = gcc
+ifndef CC
+	CC = gcc
 endif
 
 ifeq ($(MAKECMDGOALS),library)
-	CC = $(FLINT_CC) -fPIC -std=c99
+	CC += -fPIC -std=c99
 else
-	CC = $(FLINT_CC) -std=c99
+	CC += -std=c99
 endif
 
 ifndef FLINT_PY
 	FLINT_PY = python
 endif
 
-ifndef FLINT_CPP
-	FLINT_CPP = g++
+ifndef CXX 
+	CXX = g++
 endif
 
-CPP = $(FLINT_CPP) 
+LIBS = -L$(FLINT_GMP_LIB_DIR) $(FLINT_LINK_OPTIONS) -lmpfr -lgmp -lpthread -lm
 
-LIBS = -L$(FLINT_GMP_LIB_DIR) $(FLINT_LINK_OPTIONS) -lgmp -lpthread -lm
-
-LIBS2 = -L$(FLINT_GMP_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) $(FLINT_LINK_OPTIONS) -lgmp -lpthread -lntl -lm 
+LIBS2 = -L$(FLINT_GMP_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) $(FLINT_LINK_OPTIONS) -lntl -lmpfr -lgmp -lpthread -lm 
 
 ifndef FLINT_NTL_INCLUDE_DIR
-	INCS = -I$(FLINT_GMP_INCLUDE_DIR) 
+	INCS = -I$(FLINT_GMP_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) 
 else
-	INCS = -I$(FLINT_GMP_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR)
+	INCS = -I$(FLINT_GMP_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR)
 endif
 
-CFLAGS = $(INCS) $(FLINT_TUNE) -O2
+CFLAGS = $(INCS) $(FLINT_TUNE) -g -O2
 CFLAGS2 = $(INCS) $(FLINT_TUNE) -fopenmp -O2
 
 RM = rm -f
@@ -64,11 +62,16 @@ HEADERS = \
 	long_extras.h \
 	packed_vec.h \
 	zmod_poly.h \
+	F_mpz_mod_poly.h \
 	theta.h \
 	zmod_mat.h \
 	mpz_mat.h \
+	mpq_mat.h \
 	d_mat.h \
+	F_mpz_mat.h \
+	mpfr_mat.h \
 	F_mpz.h \
+	F_mpz_LLL.h \
 	F_mpz_poly.h \
 	QS/tinyQS.h
 
@@ -106,11 +109,16 @@ FLINTOBJ = \
 	long_extras.o \
 	packed_vec.o \
 	zmod_poly.o \
+ 	F_mpz_mod_poly.o \
 	theta.o \
 	zmod_mat.o \
 	mpz_mat.o \
+	mpq_mat.o \
 	d_mat.o \
+	mpfr_mat.o \
+	F_mpz_mat.o \
 	F_mpz.o \
+	F_mpz_LLL.o \
 	F_mpz_poly.o \
 	tinyQS.o \
 	factor_base.o \
@@ -123,7 +131,7 @@ QS: mpQS
 
 tune: ZmodF_mul-tune mpz_poly-tune 
 
-test: F_mpz-test mpn_extras-test fmpz_poly-test fmpz-test ZmodF-test ZmodF_poly-test mpz_poly-test ZmodF_mul-test long_extras-test zmod_poly-test zmod_mat-test
+test: F_mpz-test mpn_extras-test fmpz_poly-test fmpz-test ZmodF-test ZmodF_poly-test mpz_poly-test ZmodF_mul-test long_extras-test zmod_poly-test F_mpz_mat-test F_mpz_LLL-test zmod_mat-test d_mat-test mpfr_mat-test mpq_mat-test F_mpz_poly-test F_mpz_mod_poly-test
 
 check: test
 	./F_mpz-test
@@ -137,6 +145,13 @@ check: test
 	./zmod_poly-test
 	./zmod_mat-test
 	./fmpz_poly-test
+	./F_mpz_mat-test
+	./d_mat-test
+	./mpfr_mat-test
+	./mpq_mat-test
+	./F_mpz_LLL-test
+	./F_mpz_mod_poly-test
+	./F_mpz_poly-test
 
 profile: ZmodF_poly-profile kara-profile fmpz_poly-profile mpz_poly-profile ZmodF_mul-profile 
 
@@ -246,11 +261,8 @@ F_mpz.o: F_mpz.c $(HEADERS)
 F_mpz_mat.o: F_mpz_mat.c $(HEADERS)
 	$(CC) $(CFLAGS) -c F_mpz_mat.c -o F_mpz_mat.o
 
-F_mpz_LLL_fast_d.o: F_mpz_LLL_fast_d.c $(HEADERS)
-	$(CC) $(CFLAGS) -c F_mpz_LLL_fast_d.c -o F_mpz_LLL_fast_d.o
-
-F_mpz_LLL_HNF.o: F_mpz_LLL_HNF.c $(HEADERS)
-	$(CC) $(CFLAGS) -c F_mpz_LLL_HNF.c -o F_mpz_LLL_HNF.o
+F_mpz_LLL.o: F_mpz_LLL.c $(HEADERS)
+	$(CC) $(CFLAGS) -c F_mpz_LLL.c -o F_mpz_LLL.o
 	
 d_mat.o: d_mat.c $(HEADERS)
 	$(CC) $(CFLAGS) -c d_mat.c -o d_mat.o
@@ -260,6 +272,9 @@ mpz_poly.o: mpz_poly.c $(HEADERS)
 
 mpz_mat.o: mpz_mat.c $(HEADERS)
 	$(CC) $(CFLAGS) -c mpz_mat.c -o mpz_mat.o
+
+mpq_mat.o: mpq_mat.c $(HEADERS)
+	$(CC) $(CFLAGS) -c mpq_mat.c -o mpq_mat.o
 
 mpz_poly-tuning.o: mpz_poly-tuning.c $(HEADERS)
 	$(CC) $(CFLAGS) -c mpz_poly-tuning.c -o mpz_poly-tuning.o
@@ -276,8 +291,11 @@ packed_vec.o: packed_vec.c $(HEADERS)
 zmod_poly.o: zmod_poly.c $(HEADERS)
 	$(CC) $(CFLAGS) -c zmod_poly.c -o zmod_poly.o
 
+F_mpz_mod_poly.o: F_mpz_mod_poly.c $(HEADERS)
+	$(CC) $(CFLAGS) -c F_mpz_mod_poly.c -o F_mpz_mod_poly.o
+
 NTL-interface.o: NTL-interface.cpp $(HEADERS)
-	$(CPP) $(CFLAGS) -c NTL-interface.cpp -o NTL-interface.o
+	$(CXX) $(CFLAGS) -c NTL-interface.cpp -o NTL-interface.o
 
 theta.o: theta.c $(HEADERS)
 	$(CC) $(CFLAGS) -c theta.c -o theta.o
@@ -299,17 +317,26 @@ F_mpz_poly.o: F_mpz_poly.c $(HEADERS)
 test-support.o: test-support.c $(HEADERS)
 	$(CC) $(CFLAGS) -c test-support.c -o test-support.o
 
+d_mat-test.o: d_mat-test.c $(HEADERS)
+	$(CC) $(CFLAGS) -c d_mat-test.c -o d_mat-test.o
+
+mpfr_mat-test.o: mpfr_mat-test.c $(HEADERS)
+	$(CC) $(CFLAGS) -c mpfr_mat-test.c -o mpfr_mat-test.o
+
 fmpz_poly-test.o: fmpz_poly-test.c $(HEADERS)
 	$(CC) $(CFLAGS) -c fmpz_poly-test.c -o fmpz_poly-test.o
 
 F_mpz-test.o: F_mpz-test.c $(HEADERS)
 	$(CC) $(CFLAGS) -c F_mpz-test.c -o F_mpz-test.o
 
+F_mpz_LLL-test.o: F_mpz_LLL-test.c $(HEADERS)
+	$(CC) $(CFLAGS) -c F_mpz_LLL-test.c -o F_mpz_LLL-test.o
+
 F_mpz_mat-test.o: F_mpz_mat-test.c $(HEADERS)
 	$(CC) $(CFLAGS) -c F_mpz_mat-test.c -o F_mpz_mat-test.o
 
-F_mpz_LLL_fast_d-test.o: F_mpz_LLL_fast_d.c $(HEADERS)
-	$(CC) $(CFLAGS) -c F_mpz_LLL_fast_d-test.c -o F_mpz_LLL_fast_d-test.o
+mpq_mat-test.o: mpq_mat-test.c $(HEADERS)
+	$(CC) $(CFLAGS) -c mpq_mat-test.c -o mpq_mat-test.o
 	
 fmpz-test.o: fmpz-test.c $(HEADERS)
 	$(CC) $(CFLAGS) -c fmpz-test.c -o fmpz-test.o
@@ -344,11 +371,14 @@ zmod_mat-test.o: zmod_mat-test.c
 F_zmod_mat-test.o: F_zmod_mat-test.c
 	$(CC) $(CFLAGS) -c F_zmod_mat-test.c -o F_zmod_mat-test.o
 
-f_mpz_poly-test.o: F_mpz_poly-test.c
+F_mpz_poly-test.o: F_mpz_poly-test.c
 	$(CC) $(CFLAGS) -c F_mpz_poly-test.c -o F_mpz_poly-test.o
 
+F_mpz_mod_poly-test.o: F_mpz_mod_poly-test.c
+	$(CC) $(CFLAGS) -c F_mpz_mod_poly-test.c -o F_mpz_mod_poly-test.o
+
 NTL-interface-test.o: NTL-interface-test.cpp
-	$(CPP) $(CFLAGS) -c NTL-interface-test.cpp -o NTL-interface-test.o
+	$(CXX) $(CFLAGS) -c NTL-interface-test.cpp -o NTL-interface-test.o
 
 ####### test program targets
 
@@ -357,6 +387,12 @@ mpn_extras-test: mpn_extras-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 
 fmpz_poly-test: fmpz_poly-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 	$(CC) $(CFLAGS) fmpz_poly-test.o test-support.o -o fmpz_poly-test $(FLINTOBJ) $(LIBS)
+
+d_mat-test: d_mat-test.o test-support.o $(FLINTOBJ) $(HEADERS)
+	$(CC) $(CFLAGS) d_mat-test.o test-support.o -o d_mat-test $(FLINTOBJ) $(LIBS)
+
+mpfr_mat-test: mpfr_mat-test.o test-support.o $(FLINTOBJ) $(HEADERS)
+	$(CC) $(CFLAGS) mpfr_mat-test.o test-support.o -o mpfr_mat-test $(FLINTOBJ) $(LIBS)
 
 fmpz-test: fmpz-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 	$(CC) $(CFLAGS) fmpz-test.o test-support.o -o fmpz-test $(FLINTOBJ) $(LIBS)
@@ -373,11 +409,14 @@ ZmodF_poly-test: ZmodF_poly-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 mpz_poly-test: mpz_poly-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 	$(CC) $(CFLAGS) mpz_poly-test.o test-support.o -o mpz_poly-test $(FLINTOBJ) $(LIBS)
 
+F_mpz_LLL-test: F_mpz_LLL-test.o test-support.o $(FLINTOBJ) $(HEADERS)
+	$(CC) $(CFLAGS) F_mpz_LLL-test.o test-support.o -o F_mpz_LLL-test $(FLINTOBJ) $(LIBS)
+
 F_mpz_mat-test: F_mpz_mat-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 	$(CC) $(CFLAGS) F_mpz_mat-test.o test-support.o -o F_mpz_mat-test $(FLINTOBJ) $(LIBS)
 
-F_mpz_LLL_fast_d-test: F_mpz_LLL_fast_d-test.o test-support.o $(FLINTOBJ) $(HEADERS)
-	$(CC) $(CFLAGS) F_mpz_LLL_fast_d-test.o test-support.o -o F_mpz_LLL_fast_d-test $(FLINTOBJ) $(LIBS)
+mpq_mat-test: mpq_mat-test.o test-support.o $(FLINTOBJ) $(HEADERS)
+	$(CC) $(CFLAGS) mpq_mat-test.o test-support.o -o mpq_mat-test $(FLINTOBJ) $(LIBS)
 	
 ZmodF_mul-test: ZmodF_mul-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 	$(CC) $(CFLAGS) ZmodF_mul-test.o test-support.o -o ZmodF_mul-test $(FLINTOBJ) $(LIBS)
@@ -400,8 +439,11 @@ F_zmod_mat-test: F_zmod_mat-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 F_mpz_poly-test: F_mpz_poly-test.o test-support.o $(FLINTOBJ) $(HEADERS)
 	$(CC) $(CFLAGS) F_mpz_poly-test.o test-support.o -o F_mpz_poly-test $(FLINTOBJ) $(LIBS)
 
+F_mpz_mod_poly-test: F_mpz_mod_poly-test.o test-support.o $(FLINTOBJ) $(HEADERS)
+	$(CC) $(CFLAGS) F_mpz_mod_poly-test.o test-support.o -o F_mpz_mod_poly-test $(FLINTOBJ) $(LIBS)
+
 NTL-interface-test: NTL-interface.o NTL-interface-test.o test-support.o $(FLINTOBJ) $(HEADERS)
-	$(CPP) $(CFLAGS) NTL-interface-test.o NTL-interface.o test-support.o $(FLINTOBJ) -o NTL-interface-test $(LIBS2)
+	$(CXX) $(CFLAGS) NTL-interface-test.o NTL-interface.o test-support.o $(FLINTOBJ) -o NTL-interface-test $(LIBS2)
 
 ####### tuning program object files
 
@@ -474,7 +516,7 @@ ZmodF_mul-profile.o: ZmodF_mul-profile.c $(HEADERS)
 
 NTL-profile-tables.o: NTL-profile.c $(HEADERS)
 	$(FLINT_PY) make-profile-tables.py NTL
-	$(CPP) $(CFLAGS) -c NTL-profile-tables.c -o NTL-profile-tables.o
+	$(CXX) $(CFLAGS) -c NTL-profile-tables.c -o NTL-profile-tables.o
 
 zmod_poly-profile-tables.o: zmod_poly-profile.c $(HEADERS)
 	$(FLINT_PY) make-profile-tables.py zmod_poly
@@ -516,10 +558,10 @@ kara-profile: kara-profile.c profiler.o test-support.o $(FLINTOBJ)
 	$(CC) $(CFLAGS) -o kara-profile kara-profile.c profiler.o test-support.o $(FLINTOBJ) $(LIBS)
 
 NTL-profile: NTL-profile.c test-support.o NTL-profile-tables.o $(PROFOBJ)
-	$(CPP) $(CFLAGS) -o NTL-profile NTL-profile.c NTL-profile-tables.o test-support.o $(PROFOBJ) $(LIB) -lntl
+	$(CXX) $(CFLAGS) -o NTL-profile NTL-profile.c NTL-profile-tables.o test-support.o $(PROFOBJ) $(LIB) -lntl
 
 zmod_poly-profile: zmod_poly-profile.o zmod_poly-profile-tables.o $(PROFOBJ)
-	$(CC) $(CFLAGS) -o zmod_poly-profile zmod_poly.o zmod_poly-profile.o zmod_poly-profile-tables.o $(PROFOBJ) $(LIBS)
+	$(CC) $(CFLAGS) -o zmod_poly-profile zmod_poly-profile.o zmod_poly-profile-tables.o $(PROFOBJ) $(LIBS)
 
 bernoulli-profile: bernoulli-profile.o bernoulli-profile-tables.o $(PROFOBJ)
 	$(CC) $(CFLAGS) -o bernoulli-profile zmod_poly.o bernoulli-profile.o bernoulli-profile-tables.o $(PROFOBJ) $(LIBS)
