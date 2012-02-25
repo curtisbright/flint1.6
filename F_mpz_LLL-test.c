@@ -224,7 +224,7 @@ void mpz_mat_randajtai(mpz_mat_t mat, ulong r, ulong c, double alpha)
    mpz_clear(tmp);
 }
 
-void mpz_mat_randsimdioph(mpz_mat_t mat, ulong r, ulong c, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+void mpz_mat_randsimdioph(mpz_mat_t mat, ulong r, ulong c, ulong bits, ulong bits2)
 {
    ulong i, j;
 
@@ -249,7 +249,7 @@ void mpz_mat_randsimdioph(mpz_mat_t mat, ulong r, ulong c, mp_bitcnt_t bits, mp_
    }
 }
 
-void mpz_mat_randntrulike(mpz_mat_t mat, ulong r, ulong c, mp_bitcnt_t bits, ulong q)
+void mpz_mat_randntrulike(mpz_mat_t mat, ulong r, ulong c, ulong bits, ulong q)
 {
    ulong d, i, j, k;
 
